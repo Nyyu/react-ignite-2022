@@ -1,4 +1,7 @@
 import Link from "next/link"
+import { PencilSimpleLine } from "phosphor-react"
+import { Button } from "../Primitives/Button"
+import { Avatar } from "../User/Avatar"
 
 export const Sidebar = () => {
   return (
@@ -11,18 +14,27 @@ export const Sidebar = () => {
         />
       </picture>
 
-      <div className="flex flex-col items-center">
-        <strong>Ny</strong>
-        <span>Web Developer</span>
+      <div className="flex flex-col items-center -mt-6 gap-4">
+        <Avatar src="https://github.com/nyyu.png" h={50} w={50} />
+        <div className="flex flex-col items-center">
+          <strong className="font-bold text-base">Ny</strong>
+          <span className="font-normal text-sm text-gray-400">
+            Web Developer
+          </span>
+        </div>
       </div>
 
       <footer className="border-t border-gray-600 mt-6 pt-6 pb-8 px-8">
-        <Link
-          href="#"
-          className="w-full text-green-500 rounded-lg h-[3.13rem] font-bold bg-transparent border-green-500 border px-6 no-underline flex justify-center items-center"
+        <Button
+          variant="outline"
+          asChild
+          className="no-underline bg-transparent"
         >
-          Edit profile
-        </Link>
+          <Link href="#">
+            <PencilSimpleLine size={20} />
+            Edit profile
+          </Link>
+        </Button>
       </footer>
     </aside>
   )

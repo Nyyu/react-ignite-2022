@@ -1,6 +1,7 @@
 import Head from "next/head"
 
 import { Sidebar } from "../components/Sidebar"
+import { Post } from "../components/Post"
 
 export default function Home() {
   return (
@@ -10,7 +11,11 @@ export default function Home() {
       </Head>
       <div className="w-auto mx-auto max-w-[70rem] m-8 px-4 grid grid-cols-[256px_1fr] gap-8 items-start">
         <Sidebar />
-        <main className="">Main</main>
+        <main className="flex flex-col gap-8">
+          <Post />
+          <Post />
+          <Post />
+        </main>
       </div>
     </>
   )
