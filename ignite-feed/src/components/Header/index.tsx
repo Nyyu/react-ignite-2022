@@ -5,9 +5,12 @@ import IgniteLogo from "@/assets/ignite-logo.svg"
 
 export const Header = () => {
   return (
-    <header className="flex items-center justify-center py-5 gap-2 bg-gray-800">
-      <Image src={IgniteLogo} alt="Ignite" className="w-auto max-h-8" />
-      <Link href={"/"}>
+    <header className="py-5 bg-gray-800">
+      <Link
+        href={"/"}
+        className="text-gray-200 flex items-center justify-center gap-2"
+      >
+        <Image src={IgniteLogo} alt="Ignite" className="w-auto max-h-8" />
         <strong>Ignite Feed</strong>
       </Link>
     </header>

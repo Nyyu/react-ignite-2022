@@ -1,22 +1,38 @@
+import dayjs from "dayjs"
+import { v4 as uuid } from "uuid"
+
 import { Button } from "../Primitives/Button"
 import { Input } from "../Primitives/Input"
 import { Avatar } from "../User/Avatar"
 import { Comment } from "./Comment"
 
-export const Post = () => {
+export interface PostProps {
+  author: {
+    avatarUrl: string
+    name: string
+    role: string
+  }
+  content: { type: "text" | "anchor"; data: string }[]
+  hashtags?: string[]
+  publishedAt: Date
+}
+
+export const Post = ({
+  author: { name, role, avatarUrl },
+  content,
+  hashtags = [],
+  publishedAt,
+}: PostProps) => {
+  const dateWithSuffix = dayjs().to(dayjs(publishedAt))
+
   return (
     <article className="bg-gray-800 p-10 rounded-lg [&:not(:last-child)]:mb-8">
       <header className="flex justify-between">
         <div className="flex gap-5">
-          <Avatar
-            src="https://github.com/nyyu.png"
-            alt="User avatar"
-            w={50}
-            h={50}
-          />
+          <Avatar src={avatarUrl} alt="User avatar" w={50} h={50} />
           <div className="flex flex-col">
-            <strong className="font-bold text-gray-100">Nyyu</strong>
-            <span className="text-gray-400 text-sm">Dev Front-end</span>
+            <strong className="font-bold text-gray-100">{name}</strong>
+            <span className="text-gray-400 text-sm">{role}</span>
           </div>
         </div>
 
@@ -25,25 +41,26 @@ export const Post = () => {
           dateTime="2023-02-03 09:13:03"
           className="text-gray-400 text-sm"
         >
-          1 hour ago
+          {dateWithSuffix}
         </time>
       </header>
       <main className="flex flex-col gap-6 mt-6 font-normal text-base text-gray-300">
-        <p>
-          Hey guys 👋
-          <br />
-          <br />
-          Im Karen and Ive been working on an AI project called Karen Bot, it
-          basically consists of a bot complaining 24/7 without stopping a single
-          fraction of time. Good luck dealing with that! Love Yall
-        </p>
-
-        <a href="#">karenAiBot.dev/documentation</a>
+        {content.map((shard) =>
+          shard.type === "text" ? (
+            <p key={uuid()}>{shard.data}</p>
+          ) : (
+            <a href="#" key={uuid()}>
+              {shard.data}
+            </a>
+          )
+        )}
 
         <div className="flex gap-2">
-          <a href="#">#Karen</a>
-          <a href="#">#ImTheBest</a>
-          <a href="#">#AIBot</a>
+          {hashtags.map((hashtag) => (
+            <a href="#" key={uuid()}>
+              #{hashtag}
+            </a>
+          ))}
         </div>
       </main>
       <hr className="border-0 border-t border-gray-600 my-6" />
@@ -63,14 +80,6 @@ export const Post = () => {
             name: "Nyyu",
           }}
           likes={4}
-        />
-        <Comment
-          comment="Poggers"
-          date=""
-          user={{
-            name: "John doe",
-          }}
-          likes={12}
         />
       </div>
     </article>

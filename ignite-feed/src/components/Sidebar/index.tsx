@@ -15,7 +15,12 @@ export const Sidebar = () => {
       </picture>
 
       <div className="flex flex-col items-center -mt-6 gap-4">
-        <Avatar src="https://github.com/nyyu.png" h={50} w={50} />
+        <Avatar
+          alt="user avatar"
+          src="https://github.com/nyyu.png"
+          h={50}
+          w={50}
+        />
         <div className="flex flex-col items-center">
           <strong className="font-bold text-base">Ny</strong>
           <span className="font-normal text-sm text-gray-400">
