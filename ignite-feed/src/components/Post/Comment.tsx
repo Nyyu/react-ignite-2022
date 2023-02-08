@@ -3,7 +3,7 @@ import { ThumbsUp, Trash } from "phosphor-react"
 import { Button } from "../Primitives/Button"
 import { Avatar } from "../User/Avatar"
 
-interface CommentProps {
+export interface CommentProps {
   user: {
     name: string
     img?: string
@@ -42,7 +42,7 @@ export const Comment = ({
                 dateTime="01-19-2023 08:32:43"
                 title="Jan, 19th 2023"
               >
-                32 seconds ago
+                {date}
               </time>
             </div>
             <Button

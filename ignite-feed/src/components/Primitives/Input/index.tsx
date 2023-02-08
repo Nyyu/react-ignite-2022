@@ -1,5 +1,11 @@
-import { InputHTMLAttributes } from "react"
-import { Slot } from "@radix-ui/react-slot"
+import {
+  forwardRef,
+  ForwardRefExoticComponent,
+  ForwardRefRenderFunction,
+  InputHTMLAttributes,
+  RefAttributes,
+} from "react"
+import { Slot, SlotProps } from "@radix-ui/react-slot"
 
 import clsx from "clsx"
 
@@ -8,11 +14,11 @@ interface InputProps extends InputHTMLAttributes<HTMLTextAreaElement> {
   asChild?: boolean
 }
 
-export const Input = ({
-  className = "",
-  asChild = false,
-  ...props
-}: InputProps) => {
+const InputBase: ForwardRefRenderFunction<
+  | ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>
+  | "textarea",
+  InputProps
+> = ({ className = "", asChild = false, ...props }: InputProps, ref) => {
   const InputComponent = asChild ? Slot : "textarea"
 
   return (
@@ -22,6 +28,9 @@ export const Input = ({
         className
       )}
       {...props}
+      ref={ref as any}
     />
   )
 }
+
+export const Input = forwardRef(InputBase)

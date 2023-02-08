@@ -1,12 +1,27 @@
+import { use, useEffect, useRef, useState } from "react"
+
 import dayjs from "dayjs"
 import { v4 as uuid } from "uuid"
+
+import { api } from "../../services/api"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 import { Button } from "../Primitives/Button"
 import { Input } from "../Primitives/Input"
 import { Avatar } from "../User/Avatar"
-import { Comment } from "./Comment"
+import { Comment, CommentProps } from "./Comment"
+
+const commentSchema = z.object({
+  comment: z
+    .string()
+    .min(3, "Min content length is 3 characters")
+    .max(255, "Max content length is 255 characters"),
+})
 
 export interface PostProps {
+  id: string
   author: {
     avatarUrl: string
     name: string
@@ -17,13 +32,82 @@ export interface PostProps {
   publishedAt: Date
 }
 
+type FormProps = { comment: string }
+
 export const Post = ({
+  id,
   author: { name, role, avatarUrl },
   content,
   hashtags = [],
   publishedAt,
 }: PostProps) => {
-  const dateWithSuffix = dayjs().to(dayjs(publishedAt))
+  const [comments, setComments] = useState<CommentProps[]>([])
+  const isMounted = useRef(true)
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormProps>({
+    resolver: zodResolver(commentSchema),
+  })
+
+  // Initial data
+  useEffect(() => {
+    const handleGetComments = async () => {
+      const response = await api.get<CommentProps[]>(
+        `/users/posts/comments/${id}`
+      )
+
+      if (response) {
+        const comments = response.data?.map((comment) => ({
+          ...comment,
+          date: dayjs().to(dayjs(comment.date)),
+        }))
+
+        setComments(comments)
+      }
+    }
+
+    if (isMounted) handleGetComments()
+
+    return () => {
+      isMounted.current = false
+    }
+  }, [id])
+
+  // Kinda useless here as I don't have an actual api, but a good example
+  // const { data, isLoading, isFetching, isError } = useQuery<CommentProps[]>({
+  //   queryKey: ["comments", id],
+  //   initialData: [],
+  //   queryFn: async () => {
+  //     const response = await api.get<CommentProps[]>(
+  //       `/users/posts/comments/${id}`
+  //     )
+
+  //     const comments = response.data?.map((comment) => ({
+  //       ...comment,
+  //       date: dayjs().to(dayjs(publishedAt)),
+  //     }))
+
+  //     return comments
+  //   },
+  // })
+
+  const handleAddComment: SubmitHandler<FormProps> = async (data) => {
+    const formattedData: CommentProps = {
+      ...data,
+      date: dayjs().to(dayjs()), // idiotic example
+      user: { name: "example" },
+      likes: 0,
+    }
+
+    setComments((prev) => [...prev, formattedData])
+  }
+
+  const dateDifferenceFromNowWithSuffix = dayjs().to(dayjs(publishedAt))
+  const ISOFormattedDate = new Date(publishedAt).toISOString()
+  const formattedDate = dayjs(publishedAt).format("MMM[,] DD[/]YYYY [at] ha")
 
   return (
     <article className="bg-gray-800 p-10 rounded-lg [&:not(:last-child)]:mb-8">
@@ -37,11 +121,11 @@ export const Post = ({
         </div>
 
         <time
-          title="Feb, 03/2023 at 9pm"
-          dateTime="2023-02-03 09:13:03"
+          title={formattedDate}
+          dateTime={ISOFormattedDate}
           className="text-gray-400 text-sm"
         >
-          {dateWithSuffix}
+          {dateDifferenceFromNowWithSuffix}
         </time>
       </header>
       <main className="flex flex-col gap-6 mt-6 font-normal text-base text-gray-300">
@@ -64,23 +148,39 @@ export const Post = ({
         </div>
       </main>
       <hr className="border-0 border-t border-gray-600 my-6" />
-      <form className="flex flex-col gap-4 group">
-        <strong className="font-bold">Leave your feedback</strong>
-        <Input placeholder="ie. It looks awesome" className="resize-none" />
-        <Button className="max-w-[6.75rem] invisible max-h-0 group-focus-within:visible group-focus-within:max-h-[none]">
+      <form
+        className="flex flex-col gap-4 group"
+        onSubmit={handleSubmit(handleAddComment)}
+      >
+        <strong className="font-bold">
+          Leave your feedback{" "}
+          <span className="text-xs opacity-50">
+            {!!(errors && errors.comment) && `(${errors.comment?.message})`}
+          </span>
+        </strong>
+        <Input
+          placeholder="ie. It looks awesome"
+          className="resize-none"
+          {...register("comment")}
+        />
+        <Button
+          type="submit"
+          className="max-w-[6.75rem] invisible max-h-0 group-focus-within:visible group-focus-within:max-h-[none]"
+        >
           Publish
         </Button>
       </form>
 
       <div className="mt-8 flex flex-col gap-6">
-        <Comment
-          comment="Poggers that looks sick, just like my neighbors"
-          date=""
-          user={{
-            name: "Nyyu",
-          }}
-          likes={4}
-        />
+        {comments.map((commentData) => (
+          <Comment
+            key={uuid()}
+            comment={commentData.comment}
+            date={commentData.date}
+            user={commentData.user}
+            likes={commentData.likes}
+          />
+        ))}
       </div>
     </article>
   )

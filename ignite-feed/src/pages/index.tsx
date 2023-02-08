@@ -52,10 +52,11 @@ export default function Home({ posts = [] }) {
           {data.map((post) => (
             <Post
               key={uuid()}
+              id={post.id}
               author={post.author}
               content={post.content}
               publishedAt={post.publishedAt}
-              hashtags={["AIBot", "Art"]}
+              hashtags={post.hashtags}
             />
           ))}
         </main>
@@ -65,7 +66,7 @@ export default function Home({ posts = [] }) {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const posts = await api.get("http://localhost:3000/api/users/posts")
+  const posts = await api.get("/users/posts")
 
   return {
     props: {
