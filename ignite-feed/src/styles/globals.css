@@ -15,10 +15,13 @@ button {
 
 /* Global link styling */
 a {
-  @apply text-green-500 font-bold no-underline transition-colors a11y-focus;
+  @apply text-green-500 font-bold no-underline transition-colors;
 }
 a:hover {
   @apply text-green-400;
+}
+a:not(.no-focus) {
+  @apply a11y-focus;
 }
 
 /* Focus border (Accessibility) */
