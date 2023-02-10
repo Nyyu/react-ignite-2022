@@ -1,4 +1,4 @@
-import { use, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import dayjs from "dayjs"
 import { v4 as uuid } from "uuid"
@@ -11,11 +11,12 @@ import * as z from "zod"
 import { Button } from "../Primitives/Button"
 import { Input } from "../Primitives/Input"
 import { Avatar } from "../User/Avatar"
-import { Comment, CommentProps } from "./Comment"
+import { Comment, CommentProps, TComment } from "./Comment"
 
 const commentSchema = z.object({
   comment: z
     .string()
+    .trim()
     .min(3, "Min content length is 3 characters")
     .max(255, "Max content length is 255 characters"),
 })
@@ -41,16 +42,19 @@ export const Post = ({
   hashtags = [],
   publishedAt,
 }: PostProps) => {
-  const [comments, setComments] = useState<CommentProps[]>([])
+  const [comments, setComments] = useState<TComment[]>([])
   const isMounted = useRef(true)
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormProps>({
     resolver: zodResolver(commentSchema),
   })
+
+  const isCommentInputEmpty = watch("comment")?.length === 0
 
   // Initial data
   useEffect(() => {
@@ -95,7 +99,7 @@ export const Post = ({
   // })
 
   const handleAddComment: SubmitHandler<FormProps> = async (data) => {
-    const formattedData: CommentProps = {
+    const formattedData: TComment = {
       ...data,
       date: dayjs().to(dayjs()), // idiotic example
       user: { name: "example" },
@@ -103,6 +107,10 @@ export const Post = ({
     }
 
     setComments((prev) => [...prev, formattedData])
+  }
+
+  const deleteComment = async (comment: string) => {
+    setComments((prev) => prev.filter((data) => data.comment !== comment))
   }
 
   const dateDifferenceFromNowWithSuffix = dayjs().to(dayjs(publishedAt))
@@ -165,7 +173,8 @@ export const Post = ({
         />
         <Button
           type="submit"
-          className="max-w-[6.75rem] invisible max-h-0 group-focus-within:visible group-focus-within:max-h-[none]"
+          disabled={isCommentInputEmpty}
+          className="max-w-[6.75rem] invisible max-h-0 group-focus-within:visible group-focus-within:max-h-[none] disabled:opacity-70 disabled:cursor-not-allowed"
         >
           Publish
         </Button>
@@ -179,6 +188,7 @@ export const Post = ({
             date={commentData.date}
             user={commentData.user}
             likes={commentData.likes}
+            onDeleteComment={deleteComment}
           />
         ))}
       </div>

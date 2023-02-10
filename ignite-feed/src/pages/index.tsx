@@ -5,8 +5,8 @@ import { Sidebar } from "../components/Sidebar"
 import { Post, PostProps } from "../components/Post"
 
 import { useQuery } from "@tanstack/react-query"
-import { v4 as uuid } from "uuid"
 import { api } from "../services/api"
+import { v4 as uuid } from "uuid"
 
 const handleGetPosts = async (): Promise<PostProps[]> => {
   const posts = await api.get("http://localhost:3000/api/users/posts")
@@ -22,6 +22,7 @@ export default function Home({ posts = [] }) {
     queryKey: ["posts"],
     queryFn: handleGetPosts,
     initialData: posts,
+    staleTime: 1000 * 60 * 15, // 15 minutes
   })
 
   if (isFetching) {

@@ -1,9 +1,10 @@
 import { ThumbsUp, Trash } from "phosphor-react"
+import { useState } from "react"
 
 import { Button } from "../Primitives/Button"
 import { Avatar } from "../User/Avatar"
 
-export interface CommentProps {
+export type TComment = {
   user: {
     name: string
     img?: string
@@ -13,13 +14,25 @@ export interface CommentProps {
   likes?: number
 }
 
+export interface CommentProps extends TComment {
+  onDeleteComment: (comment: string) => void
+}
+
 export const Comment = ({
   comment,
   date,
   user: { name, img = "https://github.com/nyyu.png" },
-  likes,
+  likes = 0,
+  onDeleteComment,
 }: CommentProps) => {
-  const formattedLikes = String(likes).padStart(2, "0")
+  const [commentLikes, setCommentLikes] = useState(likes)
+  const formattedLikes = String(commentLikes).padStart(2, "0")
+
+  const handleDeleteComment = () => {
+    onDeleteComment(comment)
+  }
+
+  const handleUpdateLikes = () => setCommentLikes((prev) => prev + 1)
 
   return (
     <div className="flex gap-4">
@@ -49,6 +62,7 @@ export const Comment = ({
               title="Remove comment"
               variant="danger"
               className="self-start text-gray-400 px-0"
+              onClick={handleDeleteComment}
             >
               <Trash size={24} />
             </Button>
@@ -57,9 +71,10 @@ export const Comment = ({
         </div>
         <footer className="mt-4">
           <Button
-            title="Remove comment"
             variant="ghost"
+            title="Remove comment"
             className=" text-gray-400 px-2 gap-2"
+            onClick={handleUpdateLikes}
           >
             <ThumbsUp /> Like <span className="bullet">{formattedLikes}</span>
           </Button>
