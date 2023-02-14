@@ -1,11 +1,17 @@
-import { Button } from "@/components/primitives/Button"
+import { TaskProvider } from "../context/TaskContext"
 
-export default function Home() {
+import { CreateTaskInput } from "../components/CreateTaskInput"
+import { TaskList } from "../components/TaskList"
+
+export default async function Home() {
+  await new Promise((resolve) => setTimeout(resolve, 1500))
+
   return (
     <main>
-      <Button scheme="secondary" variant="fill">
-        Example
-      </Button>
+      <TaskProvider>
+        <CreateTaskInput />
+        <TaskList />
+      </TaskProvider>
     </main>
   )
 }
