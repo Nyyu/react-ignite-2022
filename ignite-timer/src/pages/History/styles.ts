@@ -61,3 +61,35 @@ export const HistoryList = styled.div`
     }
   }
 `
+
+// enum STATUS_COLOR {
+//   'yellow' = 'yellow-500',
+//   'green' = 'green-500',
+//   'red' = 'red-500',
+// }
+
+// eslint-disable-next-line no-unused-vars
+const STATUS_COLOR = {
+  yellow: 'yellow-500',
+  green: 'green-500',
+  red: 'red-500',
+} as const // same as enum (readonly)
+interface StatusProps {
+  statusColor: keyof typeof STATUS_COLOR // because JS can't read an object (it's keys) type directly so we need to combine keyof and typeof
+}
+
+export const Status = styled.span<StatusProps>`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  &::before {
+    content: '';
+    width: 0.8rem;
+    height: 0.8rem;
+
+    border-radius: 50%;
+    background-color: ${(props) =>
+      props.theme[STATUS_COLOR[props.statusColor]]};
+  }
+`
