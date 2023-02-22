@@ -1,19 +1,19 @@
-import styled, { css } from "styled-components"
+import styled from 'styled-components'
 
-export type ButtonVariants = "primary" | "secondary"
+export type ButtonVariants = 'primary' | 'secondary'
 
 interface ButtonContainerProps {
   variant: ButtonVariants
 }
 
 enum backgroundVariant {
-  "primary" = "green-500",
-  "primary-hover" = "green-600",
-  "primary-disabled" = "green-600",
+  'primary' = 'green-500',
+  'primary-hover' = 'green-600',
+  'primary-disabled' = 'green-600',
   //
-  "secondary" = "red-500",
-  "secondary-hover" = "red-600",
-  "secondary-disabled" = "red-600",
+  'secondary' = 'red-500',
+  'secondary-hover' = 'red-600',
+  'secondary-disabled' = 'red-600',
 }
 
 export const ButtonContainer = styled.button<ButtonContainerProps>`
@@ -28,7 +28,7 @@ export const ButtonContainer = styled.button<ButtonContainerProps>`
 
   border-radius: 8px;
 
-  color: ${(props) => props.theme["base-100"]};
+  color: ${(props) => props.theme['base-100']};
   font-size: var(--font-md);
   font-weight: bold;
 
