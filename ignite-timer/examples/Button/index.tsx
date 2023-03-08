@@ -1,10 +1,10 @@
-// import { ButtonHTMLAttributes } from 'react'
-// import { ButtonContainer, ButtonVariants } from './Button.styles'
+import { ButtonHTMLAttributes } from 'react'
+import { ButtonContainer, ButtonVariants } from './Button.styles'
 
-// interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-//   variant?: ButtonVariants
-// }
+interface ExampleButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariants
+}
 
-// export const Button = ({ variant = 'primary' }: ButtonProps) => {
-//   return <ButtonContainer variant={variant}>Example</ButtonContainer>
-// }
+export const ExampleButton = ({ variant = 'primary' }: ExampleButtonProps) => {
+  return <ButtonContainer variant={variant}>Example</ButtonContainer>
+}
