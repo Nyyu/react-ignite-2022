@@ -30,8 +30,7 @@ export const CountdownDisplay = () => {
       passedTimeInterval = setInterval(() => {
         const passedTime = differenceInSeconds(
           new Date(),
-          // eslint-disable-next-line prettier/prettier
-          activeCycle.startTime
+          new Date(activeCycle.startTime),
         )
 
         if (passedTime > totalSeconds) {

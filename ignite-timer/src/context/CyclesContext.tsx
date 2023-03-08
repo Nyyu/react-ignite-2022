@@ -1,19 +1,19 @@
+import { differenceInSeconds } from 'date-fns'
 import {
   createContext,
   ReactNode,
   useContext,
+  useEffect,
   useReducer,
   useState,
 } from 'react'
-
-export type Cycle = {
-  id: string
-  task: string
-  minutesAmount: number
-  startTime: Date
-  interruptedDate?: Date
-  finishedDate?: Date
-}
+import {
+  addNewCycleAction,
+  changeActiveCycleAction,
+  markActiveCycleAsFinishedAction,
+  markActiveCycleAsInterruptedAction,
+} from '../reducers/cycles/actions'
+import { Cycle, cyclesReducer } from '../reducers/cycles/reducer'
 
 type CyclesContextType = {
   cycles: Cycle[]
@@ -27,13 +27,6 @@ type CyclesContextType = {
   markActiveCycleAsInterrupted: () => void
 }
 
-type CyclesReducerActionType = {
-  type: 'ADD' | 'UPDATE_CURRENT' | 'INTERRUPT_CURRENT' | 'FINISH_CURRENT'
-  payload: {
-    data: any
-  }
-}
-
 const CyclesContext = createContext({} as CyclesContextType)
 
 interface CyclesProviderProps {
@@ -41,74 +34,57 @@ interface CyclesProviderProps {
 }
 
 export const CyclesProvider = ({ children }: CyclesProviderProps) => {
-  const [cycles, dispatch] = useReducer(
-    (state: Cycle[], action: CyclesReducerActionType) => {
-      switch (action.type) {
-        case 'ADD':
-          return [...state, action.payload.data]
-        case 'FINISH_CURRENT':
-          return state.map((cycle) => {
-            if (cycle.id === action.payload.data) {
-              return { ...cycle, finishedDate: new Date() }
-            } else {
-              return cycle
-            }
-            // eslint-disable-next-line prettier/prettier
-          })
-        case 'INTERRUPT_CURRENT':
-          return state.map((cycle) => {
-            if (cycle.id === action.payload.data) {
-              return { ...cycle, interruptedDate: new Date() }
-            }
-
-            return cycle
-          })
-
-        default:
-          return state
-      }
+  const [cyclesState, dispatch] = useReducer(
+    cyclesReducer,
+    {
+      activeCycleId: null,
+      cycles: [],
     },
-    // eslint-disable-next-line prettier/prettier
-    []
+    (initialState) => {
+      const storedCyclesStateJSON = localStorage.getItem(
+        '@ignite-timer/cycles-state-1.0.0',
+      )
+
+      if (storedCyclesStateJSON) {
+        return JSON.parse(storedCyclesStateJSON)
+      }
+
+      return initialState
+    },
   )
 
-  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
-  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
-
+  const { activeCycleId, cycles } = cyclesState
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
 
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(() => {
+    if (activeCycle)
+      return differenceInSeconds(new Date(), new Date(activeCycle.startTime))
+
+    return 0
+  })
+
+  useEffect(() => {
+    const cyclesStateAsJSON = JSON.stringify(cyclesState)
+    localStorage.setItem('@ignite-timer/cycles-state-1.0.0', cyclesStateAsJSON)
+  }, [cyclesState])
+
   const addNewCycle = (newCycle: Cycle) => {
-    dispatch({
-      type: 'ADD',
-      payload: {
-        data: newCycle,
-      },
-    })
+    dispatch(addNewCycleAction(newCycle))
   }
 
-  const changeActiveCycle = (id: string) => setActiveCycleId(id)
   const changeAmountSecondsPassed = (value: number) =>
     setAmountSecondsPassed(value)
 
   const markActiveCycleAsFinished = () => {
-    dispatch({
-      type: 'FINISH_CURRENT',
-      payload: {
-        data: activeCycleId,
-      },
-    })
-    setActiveCycleId(null) // -> reset app state
+    dispatch(markActiveCycleAsFinishedAction())
   }
 
   const markActiveCycleAsInterrupted = () => {
-    dispatch({
-      type: 'INTERRUPT_CURRENT',
-      payload: {
-        data: activeCycleId,
-      },
-    })
-    setActiveCycleId(null)
+    dispatch(markActiveCycleAsInterruptedAction())
   }
+
+  const changeActiveCycle = (cycleId: string) =>
+    dispatch(changeActiveCycleAction(cycleId))
 
   return (
     <CyclesContext.Provider
